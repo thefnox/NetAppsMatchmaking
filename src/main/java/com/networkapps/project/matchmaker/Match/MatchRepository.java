@@ -3,14 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.networkapps.project.matchmaker;
+package com.networkapps.project.matchmaker.Match;
 
+import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
- * @author kamai
+ * @author Martin
  */
-public interface UserRepository extends JpaRepository<User, String> {
+@Transactional
+public interface MatchRepository extends JpaRepository<Match, String> {
     
+
 }
