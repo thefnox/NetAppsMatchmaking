@@ -60,11 +60,11 @@
 	  <version>4.3.1.Final</version>
 	 </dependency>
 	    <dependency>
-	        <groupId>unknown.binary</groupId>
-	        <artifactId>hibernate-jpamodelgen-4.3.1.Final</artifactId>
-	        <version>SNAPSHOT</version>
-	        <scope>provided</scope>
-	    </dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-jpamodelgen</artifactId>
+                <version>5.2.6.Final</version>
+                <scope>provided</scope>
+            </dependency>
 	</dependencies>
 
 	<build>
