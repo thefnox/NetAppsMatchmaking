@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.networkapps.project.matchmaker;
+package com.networkapps.project.matchmaker.Tournament;
 
+import com.networkapps.project.matchmaker.User;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Entity;

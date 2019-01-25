@@ -41,9 +41,9 @@ public class UserRestController {
     
     @GetMapping("/{id}")
     public Object get(@PathVariable String id) {
-        User user = this.userRepository.findOne(id);
+        User user;
+        user = this.userRepository.findByName(id).get(0);
         if (user != null) {
-            this.userRepository.delete(id);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
@@ -62,9 +62,9 @@ public class UserRestController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
-        User user = this.userRepository.findOne(id);
+        User user;
+        user = this.userRepository.findByName(id).get(0);
         if (user != null) {
-            this.userRepository.delete(id);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

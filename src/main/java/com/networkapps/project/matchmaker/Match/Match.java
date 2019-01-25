@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.networkapps.project.matchmaker;
+package com.networkapps.project.matchmaker.Match;
 
+import com.networkapps.project.matchmaker.Tournament.Tournament;
+import com.networkapps.project.matchmaker.User;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -89,6 +91,10 @@ public class Match implements Serializable {
 
     public void setTournament(Tournament tournament) {
         this.tournament = tournament;
+    }
+    
+    public Match(Long id, User player1, User player2) {
+        
     }
     
     @Override
