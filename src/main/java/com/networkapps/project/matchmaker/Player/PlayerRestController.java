@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.networkapps.project.matchmaker;
+package com.networkapps.project.matchmaker.Player;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
