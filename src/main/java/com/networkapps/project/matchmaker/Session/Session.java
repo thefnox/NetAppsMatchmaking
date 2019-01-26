@@ -13,6 +13,7 @@ public class Session implements Serializable {
     private Long id;
     private String email;
     private String refreshToken;
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date expiry;
 
     public Long getId() {
