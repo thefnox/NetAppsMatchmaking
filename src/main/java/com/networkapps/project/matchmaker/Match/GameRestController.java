@@ -3,6 +3,7 @@ package com.networkapps.project.matchmaker.Match;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.networkapps.project.matchmaker.Player.Player;
+import com.networkapps.project.matchmaker.Player.PlayerRepository;
 import java.util.Date;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameRestController {
     
     private final GameRepository gameRepository;
+    private final PlayerRepository playerRepository;
     
-    public GameRestController(GameRepository matchRepository) {
+    public GameRestController(GameRepository matchRepository, PlayerRepository playerRepository) {
         this.gameRepository = matchRepository;
+        this.playerRepository = playerRepository;
     }
     
     @GetMapping()
@@ -97,6 +100,64 @@ public class GameRestController {
             }
         }
         return ResponseEntity.notFound().build();
+    }
+    
+    @GetMapping("/{game_id}/{player_id}")
+    public Game getResult(@PathVariable Long game_id, @PathVariable String player_id) {
+        Game current = this.gameRepository.findGameById(game_id);
+        Player player = this.playerRepository.findUserById(player_id);
+        
+        int playerWins = player.getWins();
+        int playerLosses = player.getLosses();
+        
+        if(current.getEndTime() == null) {
+            current.setEndTime(new Date());
+            this.gameRepository.save(current);
+            
+            Player opponent;
+            short result;
+            if(player.getId().equals(current.getPlayer1().getId())) {
+                opponent = current.getPlayer2();
+                result = 1;
+            } else if (player.getId().equals(current.getPlayer2().getId())) {
+                opponent = current.getPlayer1();
+                result = 2;
+            } else {
+                return null;
+            }
+            
+            int opponentLosses = opponent.getLosses();
+            int opponentWins = opponent.getWins();
+            int opponentElo = opponent.getElo();
+            
+            int playerEloHolder = player.getElo();
+            
+            player.setElo(player.getElo() + getEloChanges(opponentElo, playerWins, playerLosses, true));
+            opponent.setElo(opponentElo + getEloChanges(playerEloHolder, opponentWins, opponentLosses, false));
+            
+            current.setResult(result);
+            
+            player.setMatches(player.getMatches()+1);
+            player.setWins(player.getWins()+1);
+            
+            opponent.setLosses(opponentLosses+1);
+            opponent.setMatches(opponentWins+opponentLosses+1);
+            
+            this.playerRepository.save(player);
+            this.playerRepository.save(opponent);
+            this.gameRepository.save(current);
+            
+            return current;
+        }
+        return null;
+    }
+    
+    private int getEloChanges(int opponentElo, int wins, int losses, boolean didWin) {
+        if(didWin) {
+            return (opponentElo + 400*(wins-losses))/(wins+losses);
+        } else {
+            return (opponentElo - 400*(wins-losses))/(wins+losses);
+        }
     }
 
     private Gson createGson() {
