@@ -14,5 +14,6 @@ public interface SessionRepository extends JpaRepository<Session, String> {
     )
     public List<Session> getSessions();
 
-//    public List<Session> getSessions(@Param("name") String name);
+    @Query("SELECT s FROM Session s WHERE s.refreshToken = :refreshToken")
+    public List<Session> findByRefreshToken(@Param("refreshToken") String refreshToken);
 }

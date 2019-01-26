@@ -29,7 +29,20 @@ public class SessionRestController {
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Session> post(@RequestBody SessionRequest request) {
 
+        if (request.getEmail() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
+        if (request.getRefresh_token() != null) {
+            // Check if the refresh_token does exist
+            Session session = sessionRepository.findByRefreshToken(request.getRefresh_token()).get(0);
+            if (session == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            //HEREHERE
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
 
         //Down here works..
         Session session = new Session();
