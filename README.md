@@ -19,17 +19,17 @@ POST - /players or /games or /tournaments
           Games JSON Model
                 {
                    "player1" : {
-                        <PLAYER OBJECT>
+                        <PLAYER OBJECT WITH ID>
                    },
                    "player2" : {
-                        <PLAYER OBJECT>
+                        <PLAYER OBJECT WITH ID>
                    }
                 }
 
           Tournament JSON Model:
                 {
                   "name" : String,
-                  "players" : [<Player Objects>]
+                  "players" : [<Player Objects WITH IDs>]
                 }         
 
 PUT -/players/{id} or /games/{id} or /tournaments/{id}
@@ -52,20 +52,20 @@ PUT -/players/{id} or /games/{id} or /tournaments/{id}
                     "startTime": Date,
                     "endTime": Date,
                     "player1": {
-                        <PLAYER OBJECT>
+                        <PLAYER OBJECT WITH ID>
                     },
                     "player2": {
-                        <PLAYER OBJECT>
+                        <PLAYER OBJECT WITH ID>
                     },
                     "tournament": {
-                        <TOURNAMENT OBJECT>
+                        <TOURNAMENT OBJECT WITH ID>
                     }
                 }
 
           Tournament Model:
                 {
                     "name" : String,
-                    "players" : [<PLAYER OBJECTS>]
+                    "players" : [<PLAYER OBJECTS WITH IDs>]
                 }
 
 DELETE /players/{id} or /games/{id} or /tournaments/{id}
