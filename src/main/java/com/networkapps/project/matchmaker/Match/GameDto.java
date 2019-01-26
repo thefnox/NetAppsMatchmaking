@@ -1,16 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.networkapps.project.matchmaker.Match;
 
-/**
- *
- * @author Martin
- */
 import com.networkapps.project.matchmaker.Tournament.Tournament;
-import com.networkapps.project.matchmaker.Player;
+import com.networkapps.project.matchmaker.Player.Player;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,7 +14,24 @@ public class GameDto implements Serializable{
     private Player player1;
     private Player player2;
     private Tournament tournament;
+    
+    private GameDto() {}
 
+    public GameDto(Long game_id, Date startTime, Player player1, Player player2) {
+        this.game_id = game_id;
+        this.startTime = startTime;
+        this.player1 = player1;
+        this.player2 = player2;
+    }
+    
+    public GameDto(Long game_id, Date startTime, Player player1, Player player2, Tournament tournament) {
+        this.game_id = game_id;
+        this.startTime = startTime;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.tournament = tournament;
+    }
+    
     public Long getId() {
         return game_id;
     }
