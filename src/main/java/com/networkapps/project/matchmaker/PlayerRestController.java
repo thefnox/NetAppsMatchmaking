@@ -25,26 +25,26 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author kamai
  */
 @RestController
-@RequestMapping(path = "/users", produces = APPLICATION_JSON_VALUE)
-public class UserRestController {
+@RequestMapping(path = "/players", produces = APPLICATION_JSON_VALUE)
+public class PlayerRestController {
     
-    private final UserRepository userRepository;
+    private final PlayerRepository userRepository;
     
-    public UserRestController(UserRepository userRepository) {
+    public PlayerRestController(PlayerRepository userRepository) {
         this.userRepository = userRepository;
     }
     
     @GetMapping()
-    public List<User> list() {
+    public List<Player> list() {
         return this.userRepository.findAll();
     }
     
     @GetMapping("/{id}")
     public Object get(@PathVariable String id) {
-        User user;
-        user = this.userRepository.findByName(id).get(0);
+        Player user;
+        user = this.userRepository.findUserById(id);
         if (user != null) {
-            return ResponseEntity.ok().build();
+            return user.getId();
         }
         return ResponseEntity.notFound().build();
     }
@@ -55,14 +55,14 @@ public class UserRestController {
     }
     
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> post(@RequestBody UserDto input) {
+    public ResponseEntity<Player> post(@RequestBody PlayerDto input) {
         return ResponseEntity
-                .ok(this.userRepository.save(new User(input.getId(), input.getEmail(), input.getPassword())));
+                .ok(this.userRepository.save(new Player(input.getId(), input.getUsername(), input.getEmail(), input.getPassword())));
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
-        User user;
+        Player user;
         user = this.userRepository.findByName(id).get(0);
         if (user != null) {
             return ResponseEntity.ok().build();
