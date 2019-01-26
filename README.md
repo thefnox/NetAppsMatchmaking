@@ -36,14 +36,14 @@ PUT -/players/{id} or /games/{id} or /tournaments/{id}
 
           Player Model:
                 {
-                  "elo" : int,
-                  "email" : String,
-                  "losses" : int,
-                  "matches" : int,
-                  "password" : String,
-                  "tournamentsplayed" : int,
-                  "tournamentswon" : int,
-                  "wins" : int
+                    "elo" : int,
+                    "email" : String,
+                    "losses" : int,
+                    "matches" : int,
+                    "password" : String,
+                    "tournamentsplayed" : int,
+                    "tournamentswon" : int,
+                    "wins" : int
                 }
 
           Games Model:
@@ -64,8 +64,8 @@ PUT -/players/{id} or /games/{id} or /tournaments/{id}
 
           Tournament Model:
                 {
-                  "name" : String,
-                  "players" : [<PLAYER OBJECTS>]
+                    "name" : String,
+                    "players" : [<PLAYER OBJECTS>]
                 }
 
 DELETE /players/{id} or /games/{id} or /tournaments/{id}
