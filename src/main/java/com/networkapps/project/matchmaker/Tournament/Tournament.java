@@ -5,7 +5,7 @@
  */
 package com.networkapps.project.matchmaker.Tournament;
 
-import com.networkapps.project.matchmaker.Player;
+import com.networkapps.project.matchmaker.Player.Player;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -24,7 +24,15 @@ public class Tournament implements Serializable {
     private String name;
     
     @ManyToMany(targetEntity=Player.class)
-    private Set players;
+    private Set<Player> players;
+    
+    private Tournament() {};
+    
+    public Tournament(Long id, String name, Set<Player> players) {
+        this.tournament_id = id;
+        this.name = name;
+        this.players = players;
+    }
 
     public Long getId() {
         return tournament_id;
@@ -42,11 +50,11 @@ public class Tournament implements Serializable {
         this.name = name;
     }
 
-    public Set getPlayers() {
+    public Set<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(Set players) {
+    public void setPlayers(Set<Player> players) {
         this.players = players;
     }
     

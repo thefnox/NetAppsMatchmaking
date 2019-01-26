@@ -3,33 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.networkapps.project.matchmaker;
+package com.networkapps.project.matchmaker.Player;
 
-import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+/**
+ *
+ * @author kamai
+ */
+public class PlayerDto {
 
-@Entity
-public class Player implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    @Id
     private String player_id;
     private String email;
     private String password;
     private int wins = 0;
     private int losses = 0;
     private int matches = 0;
-    
-    @Column(name="tournaments_played", nullable = true)
     private int tournamentsPlayed = 0;
-    
-    @Column(name="tournaments_won", nullable = true)
     private int tournamentsWon = 0;
-    
     private int elo = 1000;
     
+    private PlayerDto() {
+    }
+    
+    public PlayerDto(String id, String email, String password) {
+        this.player_id = id;
+        this.email = email;
+        this.password = password;
+    }
+
     public String getId() {
         return player_id;
     }
@@ -101,38 +101,4 @@ public class Player implements Serializable {
     public void setElo(int elo) {
         this.elo = elo;
     }
-
-    public Player() {}
-    
-    public Player(String id, String email, String password) {
-        this.player_id = id;
-        this.email = email;
-        this.password = password;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (player_id != null ? player_id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Player)) {
-            return false;
-        }
-        Player other = (Player) object;
-        if ((this.player_id == null && other.player_id != null) || (this.player_id != null && !this.player_id.equals(other.player_id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "User{[ id=" + player_id + "], [email=" + email + "], [elo=" + elo + "]}";
-    }
-    
 }
