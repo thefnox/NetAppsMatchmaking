@@ -14,16 +14,16 @@ import java.util.Set;
  */
 public class TournamentDto implements Serializable{
     
-    private Long id;
+    private Long tournament_id;
     private String name;
     private Set players;
     
     public Long getId() {
-        return id;
+        return tournament_id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.tournament_id = id;
     }
 
     public String getName() {

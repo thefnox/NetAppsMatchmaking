@@ -6,24 +6,26 @@
 package com.networkapps.project.matchmaker.Match;
 
 import com.networkapps.project.matchmaker.Tournament.Tournament;
-import com.networkapps.project.matchmaker.User;
+import com.networkapps.project.matchmaker.Player;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 
 @Entity
-public class Match implements Serializable {
+public class Game implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long game_id;
     private short result = 0;
     @Basic(optional = false)
     @Temporal(javax.persistence.TemporalType.DATE)
@@ -31,18 +33,19 @@ public class Match implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date endTime;
     @ManyToOne
-    private User player1;
+    private Player player1;
     @ManyToOne
-    private User player2;
+    private Player player2;
     @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "id"))
     private Tournament tournament;
 
     public Long getId() {
-        return id;
+        return game_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long game_id) {
+        this.game_id = game_id;
     }
     
     public short getResult() {
@@ -69,19 +72,19 @@ public class Match implements Serializable {
         this.endTime = endTime;
     }
 
-    public User getPlayer1() {
+    public Player getPlayer1() {
         return player1;
     }
 
-    public void setPlayer1(User player1) {
+    public void setPlayer1(Player player1) {
         this.player1 = player1;
     }
 
-    public User getPlayer2() {
+    public Player getPlayer2() {
         return player2;
     }
 
-    public void setPlayer2(User player2) {
+    public void setPlayer2(Player player2) {
         this.player2 = player2;
     }
 
@@ -93,25 +96,24 @@ public class Match implements Serializable {
         this.tournament = tournament;
     }
     
-    public Match(Long id, User player1, User player2) {
-        
+    public Game() {
     }
     
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (game_id != null ? game_id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Match)) {
+        if (!(object instanceof Game)) {
             return false;
         }
-        Match other = (Match) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        Game other = (Game) object;
+        if ((this.game_id == null && other.game_id != null) || (this.game_id != null && !this.game_id.equals(other.game_id))) {
             return false;
         }
         return true;
@@ -119,7 +121,7 @@ public class Match implements Serializable {
 
     @Override
     public String toString() {
-        return "com.networkapps.project.matchmaker.Match[ id=" + id + " ]";
+        return "com.networkapps.project.matchmaker.Match[ id=" + game_id + " ]";
     }
     
 }

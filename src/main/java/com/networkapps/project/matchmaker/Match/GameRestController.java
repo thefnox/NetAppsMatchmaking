@@ -23,22 +23,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/match", produces = APPLICATION_JSON_VALUE)
-public class MatchRestController {
+public class GameRestController {
     
-    private final MatchRepository matchRepository;
+    private final GameRepository matchRepository;
     
-    public MatchRestController(MatchRepository matchRepository) {
+    public GameRestController(GameRepository matchRepository) {
         this.matchRepository = matchRepository;
     }
     
     @GetMapping()
-    public List<Match> list() {
-        return (List<Match>) this.matchRepository.findAll();
+    public List<Game> list() {
+        return (List<Game>) this.matchRepository.findAll();
     }
     
     @GetMapping("/{user_id}")
-    public List<Match> matchList(@PathVariable String user_id) { 
-        return (List<Match>) this.matchRepository.findAll();
+    public List<Game> matchList(@PathVariable String user_id) { 
+        return (List<Game>) this.matchRepository.findAll();
     }
     
 //    @GetMapping("/{match_id)")
@@ -51,12 +51,12 @@ public class MatchRestController {
         return null;
     }
     
-    @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Match> post(@RequestBody MatchDto input) {
-        return ResponseEntity.ok(this.matchRepository.save(new Match(input.getId(), 
-                                                                     input.getPlayer1(), 
-                                                                     input.getPlayer2())));
-    }
+//    @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Match> post(@RequestBody MatchDto input) {
+//        return ResponseEntity.ok(this.matchRepository.save(new Match(input.getId(), 
+//                                                                     input.getPlayer1(), 
+//                                                                     input.getPlayer2())));
+//    }
    
 
 }

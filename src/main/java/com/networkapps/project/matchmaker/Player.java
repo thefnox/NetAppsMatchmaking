@@ -6,27 +6,37 @@
 package com.networkapps.project.matchmaker;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class User implements Serializable {
+public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private String player_id;
     private String email;
     private String password;
     private int wins = 0;
     private int losses = 0;
     private int matches = 0;
+    
+    @Column(name="tournaments_played", nullable = true)
     private int tournamentsPlayed = 0;
+    
+    @Column(name="tournaments_won", nullable = true)
     private int tournamentsWon = 0;
+    
     private int elo = 1000;
+    
+    public String getId() {
+        return player_id;
+    }
 
+    public void setId(String id) {
+        this.player_id = id;
+    }
 
     public String getEmail() {
         return email;
@@ -91,17 +101,11 @@ public class User implements Serializable {
     public void setElo(int elo) {
         this.elo = elo;
     }
-    
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public Player() {}
     
-    public User(String name, String email, String password) {
-        this.id = name;
+    public Player(String id, String email, String password) {
+        this.player_id = id;
         this.email = email;
         this.password = password;
     }
@@ -109,18 +113,18 @@ public class User implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (player_id != null ? player_id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof User)) {
+        if (!(object instanceof Player)) {
             return false;
         }
-        User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        Player other = (Player) object;
+        if ((this.player_id == null && other.player_id != null) || (this.player_id != null && !this.player_id.equals(other.player_id))) {
             return false;
         }
         return true;
@@ -128,7 +132,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User{[ id=" + id + "], [email=" + email + "], [elo=" + elo + "]}";
+        return "User{[ id=" + player_id + "], [email=" + email + "], [elo=" + elo + "]}";
     }
     
 }

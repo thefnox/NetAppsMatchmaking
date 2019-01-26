@@ -10,26 +10,26 @@ package com.networkapps.project.matchmaker.Match;
  * @author Martin
  */
 import com.networkapps.project.matchmaker.Tournament.Tournament;
-import com.networkapps.project.matchmaker.User;
+import com.networkapps.project.matchmaker.Player;
 import java.io.Serializable;
 import java.util.Date;
 
-public class MatchDto implements Serializable{
+public class GameDto implements Serializable{
     
-    private Long id;
+    private Long game_id;
     private short result = 0;
     private Date startTime;
     private Date endTime;
-    private User player1;
-    private User player2;
+    private Player player1;
+    private Player player2;
     private Tournament tournament;
 
     public Long getId() {
-        return id;
+        return game_id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.game_id = id;
     }
     
     public short getResult() {
@@ -56,19 +56,19 @@ public class MatchDto implements Serializable{
         this.endTime = endTime;
     }
 
-    public User getPlayer1() {
+    public Player getPlayer1() {
         return player1;
     }
 
-    public void setPlayer1(User player1) {
+    public void setPlayer1(Player player1) {
         this.player1 = player1;
     }
 
-    public User getPlayer2() {
+    public Player getPlayer2() {
         return player2;
     }
 
-    public void setPlayer2(User player2) {
+    public void setPlayer2(Player player2) {
         this.player2 = player2;
     }
 

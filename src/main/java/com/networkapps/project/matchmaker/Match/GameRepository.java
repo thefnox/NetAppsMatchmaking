@@ -13,7 +13,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Martin
  */
 @Transactional
-public interface MatchRepository extends JpaRepository<Match, String> {
-    
-
+public interface GameRepository extends JpaRepository<Game, Long> {
 }

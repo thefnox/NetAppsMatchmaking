@@ -9,14 +9,33 @@ package com.networkapps.project.matchmaker;
  *
  * @author kamai
  */
-public class UserDto {
+public class PlayerDto {
+
+    private String player_id;
+    private String email;
+    private String password;
+    private int wins = 0;
+    private int losses = 0;
+    private int matches = 0;
+    private int tournamentsPlayed = 0;
+    private int tournamentsWon = 0;
+    private int elo = 1000;
+    
+    public PlayerDto() {
+    }
+
+    public PlayerDto(String id, String email, String password) {
+        this.player_id = id;
+        this.email = email;
+        this.password = password;
+    }
 
     public String getId() {
-        return id;
+        return player_id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.player_id = id;
     }
 
     public String getEmail() {
@@ -82,13 +101,4 @@ public class UserDto {
     public void setElo(int elo) {
         this.elo = elo;
     }
-    private String id;
-    private String email;
-    private String password;
-    private int wins = 0;
-    private int losses = 0;
-    private int matches = 0;
-    private int tournamentsPlayed = 0;
-    private int tournamentsWon = 0;
-    private int elo = 1000;
 }

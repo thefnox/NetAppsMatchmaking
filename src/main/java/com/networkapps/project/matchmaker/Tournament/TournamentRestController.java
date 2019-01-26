@@ -5,8 +5,7 @@
  */
 package com.networkapps.project.matchmaker.Tournament;
 
-import com.networkapps.project.matchmaker.Match.Match;
-import com.networkapps.project.matchmaker.Match.MatchRepository;
+import com.networkapps.project.matchmaker.Match.Game;
 import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import com.networkapps.project.matchmaker.Match.GameRepository;
 
 /**
  *
