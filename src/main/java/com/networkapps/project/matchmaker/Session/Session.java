@@ -2,6 +2,7 @@ package com.networkapps.project.matchmaker.Session;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 public class Session implements Serializable {
@@ -10,10 +11,10 @@ public class Session implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String email;
     private String refreshToken;
-    private String expiry; //TODO: Turn this into an actual date.
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date expiry;
 
     public Long getId() {
         return id;
@@ -39,11 +40,11 @@ public class Session implements Serializable {
         this.refreshToken = refresh_token;
     }
 
-    public String getExpiry() {
+    public Date getExpiry() {
         return expiry;
     }
 
-    public void setExpiry(String expiry) {
+    public void setExpiry(Date expiry) {
         this.expiry = expiry;
     }
 

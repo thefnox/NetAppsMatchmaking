@@ -1,12 +1,15 @@
 package com.networkapps.project.matchmaker.Session;
 
-import com.networkapps.project.matchmaker.User;
-import com.networkapps.project.matchmaker.UserDto;
+import com.networkapps.project.matchmaker.Player;
+import com.networkapps.project.matchmaker.PlayerRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -16,9 +19,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class SessionRestController {
 
     private final SessionRepository sessionRepository;
+    private final PlayerRepository playerRepository;
 
-    public SessionRestController(SessionRepository sessionRepository) {
+    public SessionRestController(SessionRepository sessionRepository, PlayerRepository playerRepository) {
         this.sessionRepository = sessionRepository;
+        this.playerRepository = playerRepository;
     }
 
     @GetMapping()
@@ -27,41 +32,69 @@ public class SessionRestController {
     }
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Session> post(@RequestBody SessionRequest request) {
+    public ResponseEntity<SessionResponse> post(@RequestBody SessionRequest request) {
 
         if (request.getEmail() == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-//        User user =
+        Player player = playerRepository.findByEmail(request.getEmail()).get(0);
+
+        if (player == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        /*  ## Create new Session ## */
+        Session newSession = new Session();
+        // Create a new refresh token.
+        String newRefreshToken = UUID.randomUUID().toString();
+        Date nowForSQL = new Date();
+
+        newSession.setRefreshToken(newRefreshToken);
+        newSession.setExpiry(nowForSQL);
+        newSession.setEmail(player.getEmail());
+
+        /* ## Create new response */
+        SessionResponse response = new SessionResponse();
+        response.setRefresh_token(newRefreshToken);
+        response.setAuth_token(player.getId() + "&&&" + player.getEmail() + "&&&" + newSession.getExpiry());
 
         if (request.getRefresh_token() != null) {
-            // Check if the refresh_token does exist
+            // Check if a session with refresh_token does exist
             Session session = sessionRepository.findByRefreshToken(request.getRefresh_token()).get(0);
             if (session == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             } else {
+                // Check if session was expired
+                if (session.getExpiry().before(nowForSQL)) {
+                    return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+                }
 
-                // Delete the old session
+                // Delete the old session, in any case.
                 sessionRepository.delete(session);
 
-                // Create new session
+                // Insert new session to the database.
+                sessionRepository.save(newSession);
 
-                return new ResponseEntity<>(HttpStatus.CREATED);
+                //Create JWT HERE...
+                // TODO: ...
+
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
+        } else if (request.getPassword() != null) {
+
+            // Check if the password is correct.
+            if (!player.getPassword().equals(request.getPassword())) {
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            //Create JWT HERE...
+            // TODO: ...
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        //Down here works..
-        Session session = new Session();
-        session.setId(new Long(234));
-        session.setEmail(request.getEmail());
-        session.setExpiry("whattee");
-        session.setRefreshToken(request.getRefresh_token());
-
-        System.out.println(request.getPassword());
-
-        return ResponseEntity
-                .ok(this.sessionRepository.save(session));
     }
 
     @ExceptionHandler(Exception.class)
@@ -97,5 +130,26 @@ class SessionRequest {
 
     public void setRefresh_token(String refresh_token) {
         this.refresh_token = refresh_token;
+    }
+}
+
+class SessionResponse {
+    String refresh_token;
+    String auth_token;
+
+    public String getRefresh_token() {
+        return refresh_token;
+    }
+
+    public void setRefresh_token(String refresh_token) {
+        this.refresh_token = refresh_token;
+    }
+
+    public String getAuth_token() {
+        return auth_token;
+    }
+
+    public void setAuth_token(String auth_token) {
+        this.auth_token = auth_token;
     }
 }
