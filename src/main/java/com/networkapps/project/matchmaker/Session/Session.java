@@ -1,11 +1,7 @@
 package com.networkapps.project.matchmaker.Session;
 
-import com.networkapps.project.matchmaker.Tournament.Tournament;
-import com.networkapps.project.matchmaker.User;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 public class Session implements Serializable {

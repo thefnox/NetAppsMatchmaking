@@ -37,4 +37,10 @@ public class SessionDto {
     public void setExpiry(String expiry) {
         this.expiry = expiry;
     }
+
+    public SessionDto(String email, String refreshToken, String expiry) {
+        this.email = email;
+        this.refreshToken = refreshToken;
+        this.expiry = expiry;
+    }
 }
