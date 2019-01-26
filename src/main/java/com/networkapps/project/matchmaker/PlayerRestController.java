@@ -57,7 +57,7 @@ public class PlayerRestController {
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Player> post(@RequestBody PlayerDto input) {
         return ResponseEntity
-                .ok(this.userRepository.save(new Player(input.getId(), input.getUsername(), input.getEmail(), input.getPassword())));
+                .ok(this.userRepository.save(new Player(input.getId(), input.getEmail(), input.getPassword())));
     }
     
     @DeleteMapping("/{id}")
