@@ -1,7 +1,7 @@
 package com.networkapps.project.matchmaker.Session;
 
-import com.networkapps.project.matchmaker.Player;
-import com.networkapps.project.matchmaker.PlayerRepository;
+import com.networkapps.project.matchmaker.Player.Player;
+import com.networkapps.project.matchmaker.Player.PlayerRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,10 +48,11 @@ public class SessionRestController {
         Session newSession = new Session();
         // Create a new refresh token.
         String newRefreshToken = UUID.randomUUID().toString();
-        Date nowForSQL = new Date();
+        // Create new expiration date that is 30 days from now.
+        Date expirationDate = new Date();
 
         newSession.setRefreshToken(newRefreshToken);
-        newSession.setExpiry(nowForSQL);
+        newSession.setExpiry(expirationDate);
         newSession.setEmail(player.getEmail());
 
         /* ## Create new response */
@@ -66,7 +67,7 @@ public class SessionRestController {
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             } else {
                 // Check if session was expired
-                if (session.getExpiry().before(nowForSQL)) {
+                if (session.getExpiry().before(expirationDate)) {
                     return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
                 }
 
