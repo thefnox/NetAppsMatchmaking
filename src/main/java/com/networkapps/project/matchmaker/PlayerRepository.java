@@ -5,7 +5,6 @@
  */
 package com.networkapps.project.matchmaker;
 
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,10 +12,7 @@ import org.springframework.data.repository.query.Param;
  *
  * @author kamai
  */
-public interface PlayerRepository extends JpaRepository<Player, String> {
-    @Query("SELECT p FROM Player p WHERE p.id = :name")
-    public List<Player> findByName(@Param("name") String name);
-    
-    @Query(value = "SELECT * FROM player p WHERE p.id = :id", nativeQuery=true)
+public interface PlayerRepository extends JpaRepository<Player, String> {   
+    @Query(value = "SELECT * FROM player p WHERE p.player_id = :id", nativeQuery=true)
     public Player findUserById(@Param("id") String id);
 }
