@@ -33,15 +33,22 @@ public class SessionRestController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+//        User user =
+
         if (request.getRefresh_token() != null) {
             // Check if the refresh_token does exist
             Session session = sessionRepository.findByRefreshToken(request.getRefresh_token()).get(0);
             if (session == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+            } else {
 
-            //HEREHERE
-            return new ResponseEntity<>(HttpStatus.CREATED);
+                // Delete the old session
+                sessionRepository.delete(session);
+
+                // Create new session
+
+                return new ResponseEntity<>(HttpStatus.CREATED);
+            }
         }
 
         //Down here works..
