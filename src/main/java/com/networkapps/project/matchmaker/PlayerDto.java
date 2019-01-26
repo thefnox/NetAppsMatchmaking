@@ -11,8 +11,7 @@ package com.networkapps.project.matchmaker;
  */
 public class PlayerDto {
 
-    private Long player_id;
-    private String username;
+    private String player_id;
     private String email;
     private String password;
     private int wins = 0;
@@ -22,33 +21,18 @@ public class PlayerDto {
     private int tournamentsWon = 0;
     private int elo = 1000;
 
-    public PlayerDto(Long id, String email, String password) {
+    public PlayerDto(String id, String email, String password) {
         this.player_id = id;
         this.email = email;
         this.password = password;
     }
 
-    public PlayerDto(Long id, String username, String email, String password) {
-        this.player_id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-    public Long getId() {
+    public String getId() {
         return player_id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.player_id = id;
-    }
-    
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {

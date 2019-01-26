@@ -17,9 +17,7 @@ public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long player_id;
-    private String username;
+    private String player_id;
     private String email;
     private String password;
     private int wins = 0;
@@ -34,11 +32,11 @@ public class Player implements Serializable {
     
     private int elo = 1000;
     
-    public Long getId() {
+    public String getId() {
         return player_id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.player_id = id;
     }
 
@@ -105,20 +103,11 @@ public class Player implements Serializable {
     public void setElo(int elo) {
         this.elo = elo;
     }
-    
-    public String getUsername() {
-        return username;
-    }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
     public Player() {}
     
-    public Player(Long id, String username, String email, String password) {
+    public Player(String id, String email, String password) {
         this.player_id = id;
-        this.username = username;
         this.email = email;
         this.password = password;
     }
