@@ -20,6 +20,9 @@ public class PlayerDto {
     private int tournamentsPlayed = 0;
     private int tournamentsWon = 0;
     private int elo = 1000;
+    
+    public PlayerDto() {
+    }
 
     public PlayerDto(String id, String email, String password) {
         this.player_id = id;
