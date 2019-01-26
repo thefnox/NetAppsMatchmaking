@@ -33,10 +33,8 @@ public class Game implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date endTime;
     @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "id"))
     private Player player1;
     @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "id"))
     private Player player2;
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "id"))
@@ -46,8 +44,8 @@ public class Game implements Serializable {
         return game_id;
     }
 
-    public void setId(Long id) {
-        this.game_id = id;
+    public void setId(Long game_id) {
+        this.game_id = game_id;
     }
     
     public short getResult() {
