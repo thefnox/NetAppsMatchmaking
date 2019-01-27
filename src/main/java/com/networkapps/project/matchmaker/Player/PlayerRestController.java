@@ -51,7 +51,12 @@ public class PlayerRestController {
         Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
         if (claims != null) {
             String player_id = claims.get("player_id").asString();
-            return new ResponseEntity<>(playerRepository.findUserById(player_id), HttpStatus.OK);
+            Player player  = playerRepository.findUserById(player_id);
+            if (player != null) {
+                return new ResponseEntity<>(playerRepository.findUserById(player_id), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -67,21 +72,27 @@ public class PlayerRestController {
         return ResponseEntity.notFound().build();
     }
     
-    @RequestMapping(value = "/{player_id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Player> put(@PathVariable String player_id, @RequestBody PlayerDto input) {
-        Player current = this.playerRepository.findUserById(player_id);
-        if(current == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @RequestMapping(value = "/me", method = PUT, consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Player> put(@RequestHeader("Authorization") String auth, @RequestBody PlayerDto input) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            String player_id = claims.get("player_id").asString();
+            Player current = this.playerRepository.findUserById(player_id);
+            if(current != null) {
+                current.setEmail(input.getEmail());
+                current.setElo(input.getElo());
+                current.setLosses(input.getLosses());
+                current.setMatches(input.getMatches());
+                current.setTournamentsPlayed(input.getTournamentsPlayed());
+                current.setTournamentsWon(input.getTournamentsWon());
+                current.setWins(input.getWins());
+                return ResponseEntity.ok(this.playerRepository.save(current));
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        current.setEmail(input.getEmail());
-        current.setElo(input.getElo());
-        current.setLosses(input.getLosses());
-        current.setMatches(input.getMatches());
-        current.setTournamentsPlayed(input.getTournamentsPlayed());
-        current.setTournamentsWon(input.getTournamentsWon());
-        current.setWins(input.getWins());
-        
-        return ResponseEntity.ok(this.playerRepository.save(current));
     }
     
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
@@ -99,16 +110,25 @@ public class PlayerRestController {
         return ResponseEntity.ok(this.playerRepository.save(player));
     }
     
-    @DeleteMapping("/{player_id}")
-    public ResponseEntity<?> delete(@PathVariable String player_id) {
-        Player player = this.playerRepository.findUserById(player_id);
-        if (player != null) {
-            this.playerRepository.deleteById(player_id);
-            if (this.playerRepository.findUserById(player_id) == null) {
-                return new ResponseEntity<>(HttpStatus.OK);
+    @DeleteMapping("/me")
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String auth) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            String player_id = claims.get("player_id").asString();
+            Player player = this.playerRepository.findUserById(player_id);
+            if (player != null) {
+                this.playerRepository.deleteById(player_id);
+                if (this.playerRepository.findUserById(player_id) == null) {
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.notFound().build();
     }
     
     @GetMapping("/leaderboard")
