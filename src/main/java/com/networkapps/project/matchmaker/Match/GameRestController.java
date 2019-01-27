@@ -164,7 +164,7 @@ public class GameRestController {
     }
     
     @GetMapping("/{game_id}/{player_id}")
-    public Game getResult(@PathVariable Long game_id, @PathVariable String player_id) {
+    public ResponseEntity<?> getResult(@PathVariable Long game_id, @PathVariable String player_id) {
         Game current = this.gameRepository.findGameById(game_id);
         Player player = this.playerRepository.findUserById(player_id);
         
@@ -179,12 +179,12 @@ public class GameRestController {
             short result;
             if(player.getId().equals(current.getPlayer1().getId())) {
                 opponent = current.getPlayer2();
-                result = 1;
+                result = 2;
             } else if (player.getId().equals(current.getPlayer2().getId())) {
                 opponent = current.getPlayer1();
-                result = 2;
+                result = 1;
             } else {
-                return null;
+                return new ResponseEntity<>("You are not a player in this match.", HttpStatus.FORBIDDEN);
             }
             
             int opponentLosses = opponent.getLosses();
@@ -193,31 +193,31 @@ public class GameRestController {
             
             int playerEloHolder = player.getElo();
             
-            player.setElo(player.getElo() + getEloChanges(opponentElo, playerWins, playerLosses, true));
-            opponent.setElo(opponentElo + getEloChanges(playerEloHolder, opponentWins, opponentLosses, false));
+            opponent.setElo(player.getElo() + getEloChanges(opponentElo, playerWins, playerLosses, true));
+            player.setElo(opponentElo + getEloChanges(playerEloHolder, opponentWins, opponentLosses, false));
             
             current.setResult(result);
             
-            player.setMatches(player.getMatches()+1);
-            player.setWins(player.getWins()+1);
+            opponent.setMatches(player.getMatches()+1);
+            opponent.setWins(player.getWins()+1);
             
-            opponent.setLosses(opponentLosses+1);
-            opponent.setMatches(opponentWins+opponentLosses+1);
+            player.setLosses(opponentLosses+1);
+            player.setMatches(opponentWins+opponentLosses+1);
             
             this.playerRepository.save(player);
             this.playerRepository.save(opponent);
             this.gameRepository.save(current);
-            
-            return current;
+
+            return new ResponseEntity<>(current, HttpStatus.OK);
         }
-        return null;
+        return new ResponseEntity<>("Game is already complete.", HttpStatus.CONFLICT);
     }
     
     private int getEloChanges(int opponentElo, int wins, int losses, boolean didWin) {
         if(didWin) {
-            return (opponentElo + 400*(wins-losses))/(wins+losses);
+            return (opponentElo + 200*(wins-losses))/(wins+losses);
         } else {
-            return (opponentElo - 400*(wins-losses))/(wins+losses);
+            return (opponentElo - 200*(wins-losses))/(wins+losses);
         }
     }
 

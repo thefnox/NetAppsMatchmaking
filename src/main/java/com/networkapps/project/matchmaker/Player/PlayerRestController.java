@@ -158,7 +158,7 @@ public class PlayerRestController {
         return "";
     }
 
-    public void sendFromGMail(String toEmail) {
+    private void sendFromGMail(String toEmail) {
         String email = "netappsranker@gmail.com";
         String password = "networkapps1";
 
