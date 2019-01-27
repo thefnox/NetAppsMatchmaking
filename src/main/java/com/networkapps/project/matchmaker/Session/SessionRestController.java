@@ -1,16 +1,14 @@
 package com.networkapps.project.matchmaker.Session;
 
+import com.networkapps.project.matchmaker.Auth.AuthUtil;
 import com.networkapps.project.matchmaker.Player.Player;
 import com.networkapps.project.matchmaker.Player.PlayerRepository;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Key;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -34,7 +32,7 @@ public class SessionRestController {
     }
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SessionResponseDto> post(@RequestBody SessionRequestDto request) {
+    public ResponseEntity<SessionResponseDto> post(@RequestBody SessionRequestDto request) throws UnsupportedEncodingException {
 
         if (request.getEmail() == null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -80,7 +78,7 @@ public class SessionRestController {
                 // Insert new session to the database.
                 sessionRepository.save(newSession);
 
-                response.setAuth_token(generateJWT(player));
+                response.setAuth_token(AuthUtil.getInstance().generateJWT(player));
 
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
@@ -94,7 +92,7 @@ public class SessionRestController {
             // Insert new session to the database.
             sessionRepository.save(newSession);
 
-            response.setAuth_token(generateJWT(player));
+            response.setAuth_token(AuthUtil.getInstance().generateJWT(player));
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -105,25 +103,5 @@ public class SessionRestController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error message")
     public void handleError() {
-    }
-
-    private String generateJWT(Player player) {
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        Map<String,Object> claims = getMyClaimsMap(player);
-        //TODO: it should be built with a proper key after development.
-        return Jwts.builder().setClaims(claims).signWith(key).setExpiration(generateExpirationDate()).compact();
-    }
-
-    private Date generateExpirationDate() {
-        Calendar calendar=new GregorianCalendar();
-        calendar.add(Calendar.DATE, 1);
-        return calendar.getTime();
-    }
-
-
-    private Map<String, Object> getMyClaimsMap(Player player) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("player", player);
-        return map;
     }
 }

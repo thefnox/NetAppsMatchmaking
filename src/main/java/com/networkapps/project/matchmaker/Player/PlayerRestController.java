@@ -5,19 +5,17 @@
  */
 package com.networkapps.project.matchmaker.Player;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import com.networkapps.project.matchmaker.Auth.AuthUtil;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Key;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
-import javax.xml.ws.Response;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -49,30 +47,15 @@ public class PlayerRestController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<String> get(@RequestHeader("Authorization") String auth) {
+    public ResponseEntity<Player> get(@RequestHeader("Authorization") String auth) {
 
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-
-        Jws<Claims> jws;
-
-        try {
-
-            Jwts.parser().setSigningKey(key.getEncoded()).parseClaimsJws(auth);
-
-            return new ResponseEntity<>(auth, HttpStatus.CREATED);
-        } catch (JwtException e) {
-
-            //don't trust the JWT!
-            return new ResponseEntity<>(auth, HttpStatus.HTTP_VERSION_NOT_SUPPORTED);
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            String player_id = claims.get("player_id").asString();
+            return new ResponseEntity<>(playerRepository.findUserById(player_id), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-
-
-//        Player player = this.playerRepository.findUserById("");
-//        if (player != null) {
-//            return new ResponseEntity<>(player, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
     }
     
 //    @GetMapping("/{id}")
