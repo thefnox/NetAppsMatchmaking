@@ -2,13 +2,21 @@ package com.networkapps.project.matchmaker.Match;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.networkapps.project.matchmaker.MatchmakerApplication;
 import com.networkapps.project.matchmaker.Player.Player;
 import com.networkapps.project.matchmaker.Player.PlayerRepository;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.springframework.http.HttpStatus;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,13 +25,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
+
+import javax.xml.ws.Response;
 
 @RestController
 @RequestMapping(path = "/games", produces = APPLICATION_JSON_VALUE)
 public class GameRestController {
-    
+    static class DeferredMatch extends DeferredResult<Object> {
+        private final String player;
+        private final Date creationDate;
+
+        public DeferredMatch(String player) {
+            this.player = player;
+            this.creationDate = new Date();
+        }
+    }
+
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
+    private final ConcurrentHashMap<String, String> matchRequests = new ConcurrentHashMap<>();
+    private final Queue<DeferredMatch> responseQueue  = new ConcurrentLinkedQueue<>();
     
     public GameRestController(GameRepository matchRepository, PlayerRepository playerRepository) {
         this.gameRepository = matchRepository;
@@ -50,6 +72,45 @@ public class GameRestController {
         return ResponseEntity.notFound().build();
     }
     
+    @GetMapping("/request/{challenge_id}/{my_id}")
+    public Object challenge(@PathVariable String challenge_id, @PathVariable String my_id) {
+        Player player = this.playerRepository.findUserById(challenge_id);
+        Player me = this.playerRepository.findUserById(my_id);
+        if (matchRequests.get(challenge_id) == null) {
+            if (player != null && me != null) {
+                matchRequests.put(challenge_id, my_id);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/listen/{my_id}")
+    public DeferredMatch listen(@PathVariable String my_id) {
+        Player me = this.playerRepository.findUserById(my_id);
+        DeferredMatch response = new DeferredMatch(my_id);
+        if (me != null) {
+            responseQueue.add(response);
+        }
+        return response;
+    }
+
+    @Scheduled(fixedRate = 1000)
+    public void processMatchRequests() {
+        Date curTime = new Date();
+        for (DeferredMatch response : responseQueue) {
+            if (matchRequests.get(response.player) != null) {
+                Player challenger = this.playerRepository.findUserById(matchRequests.get(response.player));
+                Gson gson = createGson();
+                response.setResult(gson.toJson(challenger));
+                responseQueue.remove(response);
+            } else if (((curTime.getTime() - response.creationDate.getTime()) / 1000) > 30) {
+                //cull old responses
+                responseQueue.remove(response);
+            }
+        }
+    }
+
     @RequestMapping(value = "/{id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Game> put(@PathVariable Long id, @RequestBody GameDto input) {
         Game current = this.gameRepository.findGameById(id);
