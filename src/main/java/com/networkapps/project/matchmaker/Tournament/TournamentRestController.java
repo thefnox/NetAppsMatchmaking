@@ -10,9 +10,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.networkapps.project.matchmaker.Auth.AuthUtil;
 import com.networkapps.project.matchmaker.Player.Player;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
+
+import com.networkapps.project.matchmaker.Player.PlayerDto;
+import com.networkapps.project.matchmaker.Player.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +31,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RequestMapping("/tournaments")
 public class TournamentRestController {
     private final TournamentRepository tournamentRepository;
-    
-    public TournamentRestController(TournamentRepository tournamentRepository) {
+    private final PlayerRepository playerRepository;
+
+    public TournamentRestController(TournamentRepository tournamentRepository, PlayerRepository playerRepository) {
         this.tournamentRepository = tournamentRepository;
+        this.playerRepository = playerRepository;
     }
     
     @GetMapping()
@@ -53,6 +57,60 @@ public class TournamentRestController {
             return gson.toJson(tournament);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/players")
+    public ResponseEntity<?> getAllPlayers(@PathVariable Long id) {
+        Tournament tournament = this.tournamentRepository.findTournamentById(id);
+        Set<Player> players = tournament.getPlayers();
+        if(players.isEmpty()) {
+            return new ResponseEntity<>("No players in tournament", HttpStatus.NOT_FOUND);
+        } else {
+            List<Player> playerList = new ArrayList<Player>(players);
+            Collections.shuffle(playerList);
+            return new ResponseEntity<>(playerList, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(value = "/{id}/start")
+    public ResponseEntity<?> startTournament(@PathVariable Long id) {
+        Tournament tournament = this.tournamentRepository.findTournamentById(id);
+        Set<Player> players = tournament.getPlayers();
+        List<Player> playerList = new ArrayList<Player>(players);
+        Collections.shuffle(playerList);
+
+        //Not Happening
+        return new ResponseEntity<>("Tournament started!", HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/join", method = PUT, consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> joinTournament(@PathVariable Long id,
+                                            @RequestBody PlayerDto input,
+                                            @RequestHeader("Authorization") String auth) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            Tournament tournament = this.tournamentRepository.findTournamentById(id);
+            Set<Player> players = tournament.getPlayers();
+
+            if(tournament.getMaxPlayers()==players.size()) {
+                return new ResponseEntity<>("Tournament is full.", HttpStatus.CONFLICT);
+            }
+
+            for(Player p : players) {
+                if (p.getId().equals(input.getId())) {
+                    return new ResponseEntity<>("Player already registered in tournament", HttpStatus.CONFLICT);
+                }
+            }
+
+            Player player = this.playerRepository.findUserById(input.getId());
+            players.add(player);
+            tournament.setPlayers(players);
+
+            return new ResponseEntity<>(this.tournamentRepository.save(tournament), HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>("Invalid authentication.", HttpStatus.FORBIDDEN);
+        }
     }
     
     @RequestMapping(value = "/{id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
@@ -84,6 +142,11 @@ public class TournamentRestController {
                                   @RequestHeader("Authorization") String auth) {
         Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
         if (claims != null) {
+
+            if(input.getMaxPlayers()%2 != 0) {
+                return new ResponseEntity<>("Tournament must have an even max number of players.", HttpStatus.BAD_REQUEST);
+            }
+
             Tournament check;
             check = this.tournamentRepository.findTournamentById(input.getId());
             if (check != null) {

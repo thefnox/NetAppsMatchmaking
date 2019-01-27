@@ -110,6 +110,18 @@ public class Player implements Serializable {
         this.password = password;
     }
 
+    public Player(String player_id, String email, String password, int wins, int losses, int matches, int tournamentsPlayed, int tournamentsWon, int elo) {
+        this.player_id = player_id;
+        this.email = email;
+        this.password = password;
+        this.wins = wins;
+        this.losses = losses;
+        this.matches = matches;
+        this.tournamentsPlayed = tournamentsPlayed;
+        this.tournamentsWon = tournamentsWon;
+        this.elo = elo;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
