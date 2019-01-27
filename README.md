@@ -4,8 +4,15 @@ Uses Spring Boot
 GET - /players or /games or /tournaments
 returns all players, games or tournaments
 
+GET - /players/leaderboard
+returns sorted list of all players by Elo in descending order
+
 GET -/players/{id} or /games/{id} or /tournaments/{id}
 returns player, game or tournament with id={id}
+
+GET -/games/{match_id}/{player_id}
+returns a completed game object with an end time and result (0 = no result, 1 = player 1 win, 2 = player 2 win)
+Also performs Elo and win/loss changes on both players based on which player made the api call.
 
 POST - /players or /games or /tournaments
 

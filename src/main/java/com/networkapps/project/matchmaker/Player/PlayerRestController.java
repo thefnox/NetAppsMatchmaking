@@ -5,22 +5,22 @@
  */
 package com.networkapps.project.matchmaker.Player;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.networkapps.project.matchmaker.Auth.AuthUtil;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  *
@@ -42,9 +42,19 @@ public class PlayerRestController {
         if (!list.isEmpty()) {
             Gson gson = createGson();
             return gson.toJson(list);
-
         }
         return "";
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Player> getMe(@RequestHeader("Authorization") String auth) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            String player_id = claims.get("player_id").asString();
+            return new ResponseEntity<>(playerRepository.findUserById(player_id), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
     
     @GetMapping("/{player_id}")
