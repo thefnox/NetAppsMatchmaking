@@ -22,16 +22,40 @@ public class Tournament implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long tournament_id;
     private String name;
+    private int maxPlayers;
     
     @ManyToMany(targetEntity=Player.class)
     private Set<Player> players;
     
-    private Tournament() {};
+    private Tournament() {}
+
+    public Tournament(Long id, String name, int maxPlayers) {
+        this.tournament_id = id;
+        this.name = name;
+        this.maxPlayers = maxPlayers;
+    }
     
-    public Tournament(Long id, String name, Set<Player> players) {
+    public Tournament(Long id, String name, Set<Player> players, int maxPlayers) {
         this.tournament_id = id;
         this.name = name;
         this.players = players;
+        this.maxPlayers = maxPlayers;
+    }
+
+    public Long getTournament_id() {
+        return tournament_id;
+    }
+
+    public void setTournament_id(Long tournament_id) {
+        this.tournament_id = tournament_id;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
     }
 
     public Long getId() {
