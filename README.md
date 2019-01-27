@@ -1,23 +1,23 @@
 # NetAppsMatchmaking
 Uses Spring Boot
 
-GET - /players or /games or /tournaments
-returns all players, games or tournaments
+GET - /players or /games or /tournaments or /tournament-results
+returns all players, games, tournaments or tournament-results
 
 GET - /players/leaderboard
 returns sorted list of all players by Elo in descending order
 
-GET -/players/{id} or /games/{id} or /tournaments/{id}
-returns player, game or tournament with id={id}
+GET -/players/{id} or /games/{id} or /tournaments/{id} or /tournament-results/{id}
+returns player, game, tournament or tournament-result with id={id}
 
-GET -/players/me //with Authorization header and the auth_token(without Bearer)
+GET -/players/me (with Authorization header and the auth_token(without Bearer))
 returns the player who owns the auth_token.
 
-GET -/games/{match_id}/{player_id}
+GET -/games/{match_id}/{player_id} <- this is to determine the winner of a match
 returns a completed game object with an end time and result (0 = no result, 1 = player 1 win, 2 = player 2 win)
 Also performs Elo and win/loss changes on both players based on which player made the api call.
 
-POST - /players or /games or /tournaments
+POST - /players or /games or /tournaments or /tournament-results
 
           Player JSON Model:
                 {
@@ -41,8 +41,15 @@ POST - /players or /games or /tournaments
                   "name" : String,
                   "players" : [<Player Objects WITH IDs>]
                 }         
+                
+          Tournament-results JSON Model:
+                {
+                  "player" : {<Player object with id>},
+                  "tournament" : {<Tournament object with id>}, 
+                  "position" : Int
+                }
 
-PUT -/players/me //with auth or /games/{id} or /tournaments/{id}
+PUT -/players/me //with auth or /games/{id} or /tournaments/{id} or /tournament-results/{id}
 
           Player Model:
                 {
@@ -77,6 +84,13 @@ PUT -/players/me //with auth or /games/{id} or /tournaments/{id}
                     "name" : String,
                     "players" : [<PLAYER OBJECTS WITH IDs>]
                 }
+                
+          Tournament-results Model  (can only modify position):
+                {
+                     "player" : {<Player object with id>},
+                     "tournament" : {<Tournament object with id>}, 
+                     "position" : Int
+                }          
 
-DELETE /players/me //with auth or /games/{id} or /tournaments/{id}
-deletes player, game or tournament with id = {id}
+DELETE /players/me //with auth or /games/{id} or /tournaments/{id} or /tournament-results/{id}
+deletes player, game, tournament or tournament-result with id = {id}

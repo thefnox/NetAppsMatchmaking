@@ -18,13 +18,21 @@ public class TournamentDto implements Serializable{
     private Long tournament_id;
     private String name;
     private Set<Player> players;
-    
+    private int maxPlayers;
+
     private TournamentDto() {};
+
+    private TournamentDto(Long id, String name, int maxPlayers) {
+        this.tournament_id = id;
+        this.name = name;
+        this.maxPlayers = maxPlayers;
+    }
     
-    public TournamentDto(Long id, String name, Set players) {
+    public TournamentDto(Long id, String name, Set players, int maxPlayers) {
         this.tournament_id = id;
         this.name = name;
         this.players = players;
+        this.maxPlayers = maxPlayers;
     }
     
     public Long getId() {
@@ -33,6 +41,14 @@ public class TournamentDto implements Serializable{
 
     public void setId(Long id) {
         this.tournament_id = id;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
     }
 
     public String getName() {

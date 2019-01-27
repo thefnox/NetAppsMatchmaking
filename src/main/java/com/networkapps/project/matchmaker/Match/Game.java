@@ -37,7 +37,7 @@ public class Game implements Serializable {
     private Player player1;
     @ManyToOne
     private Player player2;
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "tournament_id"))
     private Tournament tournament;
     
