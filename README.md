@@ -17,6 +17,13 @@ GET -/games/{match_id}/{player_id} <- this is to determine the winner of a match
 returns a completed game object with an end time and result (0 = no result, 1 = player 1 win, 2 = player 2 win)
 Also performs Elo and win/loss changes on both players based on which player made the api call.
 
+GET -/tournaments/{tournament_id}/players
+returns a shuffled list of all players in a tournament
+
+PUT -/tournaments/{tournament_id}/join (with authorisation header - no bearer)
+Body should be a Player JSON model with id field. 
+Adds you to the list of players in a tournament
+
 POST - /players or /games or /tournaments or /tournament-results
 
           Player JSON Model:
