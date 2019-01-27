@@ -47,8 +47,7 @@ public class PlayerRestController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Player> get(@RequestHeader("Authorization") String auth) {
-
+    public ResponseEntity<Player> getMe(@RequestHeader("Authorization") String auth) {
         Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
         if (claims != null) {
             String player_id = claims.get("player_id").asString();
@@ -58,15 +57,15 @@ public class PlayerRestController {
         }
     }
     
-//    @GetMapping("/{id}")
-//    public Object get(@PathVariable String id) {
-//        Player player = this.playerRepository.findUserById(id);
-//        if (player != null) {
-//            Gson gson = createGson();
-//            return gson.toJson(player);
-//        }
-//        return ResponseEntity.notFound().build();
-//    }
+    @GetMapping("/{id}")
+    public Object get(@PathVariable String id) {
+        Player player = this.playerRepository.findUserById(id);
+        if (player != null) {
+            Gson gson = createGson();
+            return gson.toJson(player);
+        }
+        return ResponseEntity.notFound().build();
+    }
     
     @RequestMapping(value = "/{id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Player> put(@PathVariable String id, @RequestBody PlayerDto input) {

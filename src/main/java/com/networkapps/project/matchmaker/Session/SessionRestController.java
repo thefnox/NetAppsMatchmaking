@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -32,7 +31,7 @@ public class SessionRestController {
     }
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SessionResponseDto> post(@RequestBody SessionRequestDto request) throws UnsupportedEncodingException {
+    public ResponseEntity<SessionResponseDto> post(@RequestBody SessionRequestDto request) {
 
         if (request.getEmail() == null) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -96,7 +95,7 @@ public class SessionRestController {
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
