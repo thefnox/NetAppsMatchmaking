@@ -1,12 +1,15 @@
 package com.networkapps.project.matchmaker.Match;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.networkapps.project.matchmaker.Auth.AuthUtil;
 import com.networkapps.project.matchmaker.MatchmakerApplication;
 import com.networkapps.project.matchmaker.Player.Player;
 import com.networkapps.project.matchmaker.Player.PlayerRepository;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -17,14 +20,11 @@ import org.springframework.http.HttpStatus;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.xml.ws.Response;
@@ -85,14 +85,20 @@ public class GameRestController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/listen/{my_id}")
-    public DeferredMatch listen(@PathVariable String my_id) {
-        Player me = this.playerRepository.findUserById(my_id);
-        DeferredMatch response = new DeferredMatch(my_id);
-        if (me != null) {
-            responseQueue.add(response);
+    @GetMapping("/listen")
+    public DeferredMatch listen(@RequestHeader("Authorization") String auth) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (claims != null) {
+            String my_id = claims.get("player_id").asString();
+            Player me = this.playerRepository.findUserById(my_id);
+            DeferredMatch response = new DeferredMatch(my_id);
+            if (me != null) {
+                responseQueue.add(response);
+            }
+            return response;
+        } else {
+            return null;
         }
-        return response;
     }
 
     @Scheduled(fixedRate = 1000)
