@@ -12,10 +12,10 @@ public class TournamentResultDto {
 
     public TournamentResultDto() {}
 
-    public TournamentResultDto(Long id, Player player, int position) {
-        this.id = id;
+    public TournamentResultDto(Long id, Player player, int position, Tournament tournament) {
         this.player = player;
         this.position = position;
+        this.tournament = tournament;
     }
 
     public Long getId() {

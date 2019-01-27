@@ -78,10 +78,13 @@ public class TournamentResultRestController {
             Player player = input.getPlayer();
             Tournament tournament = input.getTournament();
 
-            TournamentResult tournamentResult = new TournamentResult(player, input.getPosition(), tournament);
+            TournamentResult tournamentResult = new TournamentResult();
+            tournamentResult.setPlayer(player);
+            tournamentResult.setTournament(tournament);
+            tournamentResult.setPosition(input.getPosition());
             return ResponseEntity.ok(this.tournamentResultRepository.save(tournamentResult));
         } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>("Unauthorized.", HttpStatus.FORBIDDEN);
         }
     }
 
@@ -94,7 +97,7 @@ public class TournamentResultRestController {
             if (tournamentResult != null) {
                 this.tournamentResultRepository.deleteById(id);
                 if (this.tournamentResultRepository.findTournamentResultById(id) == null) {
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return new ResponseEntity<>("User successfully deleted.", HttpStatus.OK);
                 }
             }
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
