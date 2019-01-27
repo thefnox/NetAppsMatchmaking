@@ -57,9 +57,9 @@ public class PlayerRestController {
         }
     }
     
-    @GetMapping("/{id}")
-    public Object get(@PathVariable String id) {
-        Player player = this.playerRepository.findUserById(id);
+    @GetMapping("/{player_id}")
+    public Object get(@PathVariable String player_id) {
+        Player player = this.playerRepository.findUserById(player_id);
         if (player != null) {
             Gson gson = createGson();
             return gson.toJson(player);
@@ -67,9 +67,9 @@ public class PlayerRestController {
         return ResponseEntity.notFound().build();
     }
     
-    @RequestMapping(value = "/{id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Player> put(@PathVariable String id, @RequestBody PlayerDto input) {
-        Player current = this.playerRepository.findUserById(id);
+    @RequestMapping(value = "/{player_id}", method = PUT, consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Player> put(@PathVariable String player_id, @RequestBody PlayerDto input) {
+        Player current = this.playerRepository.findUserById(player_id);
         if(current == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -99,16 +99,26 @@ public class PlayerRestController {
         return ResponseEntity.ok(this.playerRepository.save(player));
     }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        Player player = this.playerRepository.findUserById(id);
+    @DeleteMapping("/{player_id}")
+    public ResponseEntity<?> delete(@PathVariable String player_id) {
+        Player player = this.playerRepository.findUserById(player_id);
         if (player != null) {
-            this.playerRepository.deleteById(id);
-            if (this.playerRepository.findUserById(id) == null) {
+            this.playerRepository.deleteById(player_id);
+            if (this.playerRepository.findUserById(player_id) == null) {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }
         return ResponseEntity.notFound().build();
+    }
+    
+    @GetMapping("/leaderboard")
+    public String leaderboardList() {
+        List<Player> list = this.playerRepository.getLeaderboard();
+        if (!list.isEmpty()) {
+            Gson gson = createGson();
+            return gson.toJson(list);
+        }
+        return "";
     }
     
     @ExceptionHandler(Exception.class)
