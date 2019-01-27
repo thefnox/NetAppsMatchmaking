@@ -13,9 +13,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -96,7 +105,7 @@ public class PlayerRestController {
     }
     
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Player> post(@RequestBody PlayerDto input) {
+    public ResponseEntity<?> post(@RequestBody PlayerDto input) {
         Player check = this.playerRepository.findUserById(input.getId());
         if(check != null) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -107,9 +116,17 @@ public class PlayerRestController {
         player.setLosses(0);
         player.setTournamentsPlayed(0);
         player.setTournamentsWon(0);
-        return ResponseEntity.ok(this.playerRepository.save(player));
+        ResponseEntity.ok(this.playerRepository.save(player));
+        check = this.playerRepository.findUserById(player.getId());
+        if (check != null) {
+            sendFromGMail(check.getEmail());
+            return ResponseEntity.ok(check);
+        }
+        else {
+            return new ResponseEntity<>("Some thing went wrong! User was not created", HttpStatus.BAD_REQUEST);
+        }
     }
-    
+
     @DeleteMapping("/me")
     public ResponseEntity<?> delete(@RequestHeader("Authorization") String auth) {
         Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
@@ -139,6 +156,36 @@ public class PlayerRestController {
             return gson.toJson(list);
         }
         return "";
+    }
+
+    public void sendFromGMail(String toEmail) {
+        String email = "netappsranker@gmail.com";
+        String password = "networkapps1";
+
+        Properties props = System.getProperties();
+        String host = "smtp.gmail.com";
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.user", email);
+        props.put("mail.smtp.password", password);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+
+        Session session = Session.getDefaultInstance(props);
+        MimeMessage message = new MimeMessage(session);
+
+        try {
+            message.setFrom(new InternetAddress(email));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject("Registration");
+            message.setText("You have successfully registered to Ranker!");
+            Transport transport = session.getTransport("smtp");
+            transport.connect(host, email, password);
+            transport.sendMessage(message, message.getAllRecipients());
+            transport.close();
+        } catch (MessagingException ae) {
+            ae.printStackTrace();
+        }
     }
     
     @ExceptionHandler(Exception.class)
