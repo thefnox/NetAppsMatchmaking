@@ -42,7 +42,7 @@ public class Game implements Serializable {
     private Tournament tournament;
     
     //Empty constructor required for some reason
-    private Game() {}
+    public Game() {}
     
     //Constructor for normal game
     public Game(Long game_id, Date startTime, Player player1, Player player2) {

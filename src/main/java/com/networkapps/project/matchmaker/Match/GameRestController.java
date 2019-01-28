@@ -32,7 +32,7 @@ import javax.xml.ws.Response;
 @RestController
 @RequestMapping(path = "/games", produces = APPLICATION_JSON_VALUE)
 public class GameRestController {
-    static class DeferredMatch extends DeferredResult<Object> {
+    static class DeferredMatch extends DeferredResult<ResponseEntity<Game>> {
         private final String player;
         private final Date creationDate;
 
@@ -72,11 +72,13 @@ public class GameRestController {
         return ResponseEntity.notFound().build();
     }
     
-    @GetMapping("/request/{challenge_id}/{my_id}")
-    public Object challenge(@PathVariable String challenge_id, @PathVariable String my_id) {
+    @GetMapping("/request/{challenge_id}")
+    public Object challenge(@RequestHeader("Authorization") String auth, @PathVariable String challenge_id) {
         Player player = this.playerRepository.findUserById(challenge_id);
-        Player me = this.playerRepository.findUserById(my_id);
-        if (matchRequests.get(challenge_id) == null) {
+        Map<String, Claim> claims = AuthUtil.getInstance().verifyAndGetClaims(auth);
+        if (matchRequests.get(challenge_id) == null && claims != null) {
+            String my_id = claims.get("player_id").asString();
+            Player me = this.playerRepository.findUserById(my_id);
             if (player != null && me != null) {
                 matchRequests.put(challenge_id, my_id);
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -106,9 +108,20 @@ public class GameRestController {
         Date curTime = new Date();
         for (DeferredMatch response : responseQueue) {
             if (matchRequests.get(response.player) != null) {
+                Player challenged = this.playerRepository.findUserById(response.player);
                 Player challenger = this.playerRepository.findUserById(matchRequests.get(response.player));
-                Gson gson = createGson();
-                response.setResult(gson.toJson(challenger));
+                Game game = new Game();
+                game.setPlayer1(challenged);
+                game.setPlayer2(challenger);
+                game.setStartTime(new Date());
+                ResponseEntity<Game> res = ResponseEntity.ok(this.gameRepository.save(game));
+                response.setResult(res);
+                for (DeferredMatch response2 : responseQueue) {
+                    if (response2.player.equals(challenger.getId())) {
+                        response2.setResult(res);
+                        responseQueue.remove(response2);
+                    }
+                }
                 responseQueue.remove(response);
             } else if (((curTime.getTime() - response.creationDate.getTime()) / 1000) > 30) {
                 //cull old responses
