@@ -13,7 +13,8 @@ returns player, game, tournament or tournament-result with id={id}
 GET -/players/me (with Authorization header and the auth_token(without Bearer))
 returns the player who owns the auth_token.
 
-GET -/games/{match_id}/{player_id} <- this is to determine the winner of a match
+POST -/games/{match_id} <- this is to determine the winner of a match
+Requires Auth token to determine your own player_id
 returns a completed game object with an end time and result (0 = no result, 1 = player 1 win, 2 = player 2 win)
 Also performs Elo and win/loss changes on both players based on which player made the api call.
 
