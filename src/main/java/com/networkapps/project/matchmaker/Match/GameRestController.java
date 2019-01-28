@@ -7,10 +7,8 @@ import com.networkapps.project.matchmaker.Auth.AuthUtil;
 import com.networkapps.project.matchmaker.MatchmakerApplication;
 import com.networkapps.project.matchmaker.Player.Player;
 import com.networkapps.project.matchmaker.Player.PlayerRepository;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,6 +33,22 @@ public class GameRestController {
     static class DeferredMatch extends DeferredResult<ResponseEntity<Game>> {
         private final String player;
         private final Date creationDate;
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(player, creationDate);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof DeferredMatch))
+                return false;
+            if (obj == this)
+                return true;
+
+            DeferredMatch rhs = (DeferredMatch) obj;
+            return Objects.equals(player, rhs.player) && Objects.equals(creationDate, rhs.creationDate);
+        }
 
         public DeferredMatch(String player) {
             this.player = player;
@@ -109,7 +123,7 @@ public class GameRestController {
         for (DeferredMatch response : responseQueue) {
             if (matchRequests.get(response.player) != null) {
                 Player challenged = this.playerRepository.findUserById(response.player);
-                Player challenger = this.playerRepository.findUserById(matchRequests.get(response.player));
+                Player challenger = this.playerRepository.findUserById(matchRequests.get(challenged.getId()));
                 Game game = new Game();
                 game.setPlayer1(challenged);
                 game.setPlayer2(challenger);
@@ -122,6 +136,8 @@ public class GameRestController {
                         responseQueue.remove(response2);
                     }
                 }
+                matchRequests.remove(challenged.getId());
+                matchRequests.remove(challenger.getId());
                 responseQueue.remove(response);
             } else if (((curTime.getTime() - response.creationDate.getTime()) / 1000) > 30) {
                 //cull old responses
