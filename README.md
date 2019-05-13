@@ -1,6 +1,9 @@
 # NetAppsMatchmaking
 Uses Spring Boot
 
+BASE URL:
+http://netappsmm.eu-north-1.elasticbeanstalk.com/
+
 GET - /players or /games or /tournaments or /tournament-results
 returns all players, games, tournaments or tournament-results
 
